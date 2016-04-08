@@ -1,0 +1,24 @@
+{
+  "name": "bweb",
+  "version": "0.1",
+  "description": "web interface library",
+  "url": "https://github.com/BlackEarth/bweb",
+  "author": "Sean Harrison",
+  "author_email": "sah@blackearthgroup.com",
+  "license": "LGPL 3.0",
+  "classifiers": [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: GNU Library or Lesser General Public License (LGPL)",
+    "Programming Language :: Python :: 3"
+  ],
+  "entry_points": {},
+  "install_requires": ["bl", "tornado"],
+  "extras_require": {
+    "dev": [],
+    "test": []
+  },
+  "package_data": {
+    },
+  "data_files": []
+}
