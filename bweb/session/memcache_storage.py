@@ -4,9 +4,9 @@ DEBUG = False
 import json
 import memcache         # pip install python-memcached
 
-from bl.session import Session, SessionStorage
+from . import Session, MemoryStorage
 
-class MemcacheStorage(SessionStorage):
+class MemcacheStorage(MemoryStorage):
     """Memcache storage of sessions.
         init with memcache server location (default 127.0.0.1:11211)
 

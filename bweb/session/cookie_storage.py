@@ -4,9 +4,10 @@ DEBUG = False
 import json
 from random import random
 from base64 import urlsafe_b64encode, urlsafe_b64decode
+
 from Crypto.Cipher import AES       # pip install pycrypto
 
-from bl.session import Session, SessionStorage
+from . import Session, SessionStorage
 
 class CookieStorage(SessionStorage):
     """Cookie storage of sessions.

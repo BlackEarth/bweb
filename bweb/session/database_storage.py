@@ -1,8 +1,10 @@
 
 import json
-from bl.session import Session, MemoryStorage
-from bl.database import Database
-from bl.model import Model
+
+from bsql.database import Database      # pip install bsql
+from bsql.model import Model
+
+from . import Session, MemoryStorage
 
 class SessionModel(Model):
     relation = 'sessions'
@@ -13,7 +15,7 @@ class DatabaseStorage(MemoryStorage):
         init with a DB-API 2.0 db connection.
 
     Example Session (uses an in-memory sqlite database for storage)
-    >>> from bl.database import Database
+    >>> from bsql.database import Database
     >>> db = Database()                             
     >>> db.execute('''create table sessions (id varchar primary key, data text)''')
     >>> st = DatabaseStorage(db)

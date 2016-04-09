@@ -93,8 +93,26 @@ class Session(dict):
     def delete(self):
         self.storage.delete(self.id)
 
-    def decode_bytes(self, encoding='UTF-8'):
-        return Dict(**self).decode_bytes(encoding=encoding)
+    @classmethod
+    def decode(C, session, encoding='UTF-8'):
+        d = Dict(**session)
+        for k in d: 
+            if type(d[k])==bytes:
+                d[k] = d[k].decode(encoding=encoding)
+            elif type(d[k])==Dict:
+                d[k] = C.decode(d[k], encoding=encoding)
+        return d
+
+    @classmethod
+    def encode(C, session, encoding='UTF-8'):
+        d = Dict(**session)
+        for k in d: 
+            if type(d[k])==str:
+                d[k] = d[k].encode(encoding=encoding)
+            elif type(d[k])==Dict:
+                d[k] = C.encode(d[k], encoding=encoding)
+        return d
+
 
 # ---------------------------------------------------------------------------
 

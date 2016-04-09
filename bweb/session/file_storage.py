@@ -4,13 +4,13 @@ DEBUG = False
 import os, json
 from bl.dict import Dict
 
-from bl.session import Session, SessionStorage
+from . import Session, MemoryStorage
 SESSIONS_PATH = os.path.join(os.path.dirname(__file__), 'cache', 'sessions')
 
-class FileStorage(SessionStorage):
+class FileStorage(MemoryStorage):
     """File-based storage for sessions.
         init with name of directory (which must exist) where sessions will be stored.
-    Example: (pretty much the same as the example for SessionStorage)
+    Example: (pretty much the same as the example for MemoryStorage)
     >>> st = FileStorage(SESSIONS_PATH)      # local path to sessions folder
     >>> s = Session(st, name='sah')
     >>> s
@@ -28,8 +28,10 @@ class FileStorage(SessionStorage):
     >>> s3 = Session.load(st, s.id)
     >>> s3 == {} and s3.id != s.id and s3.id != None
     True
+    >>> import shutil
+    >>> shutil.rmtree(SESSIONS_PATH)
     """
-    def __init__(self, directory=''):
+    def __init__(self, directory):
         self.directory = os.path.abspath(directory)
         if not os.path.exists(self.directory): os.makedirs(self.directory)
         if not os.path.isdir(self.directory): raise ValueError("File '%s' exists but is not a directory" % directory)
@@ -55,7 +57,7 @@ class FileStorage(SessionStorage):
             os.makedirs(self.session_dir(session.id))
         # write the file, overwriting what is there.
         f = open(self.session_file(session.id), 'w')
-        f.write(json.dumps(session.decode_bytes()))
+        f.write(json.dumps(Session.decode(session)))
         f.close
 
     def delete(self, sessionid):
