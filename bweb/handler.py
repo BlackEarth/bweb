@@ -5,8 +5,6 @@ import tornado.web
 from bl.dict import Dict, StringDict
 from bl.url import URL
 
-import .session
-
 class Handler(tornado.web.RequestHandler, Dict):
 
     def __init__(self, application, request, **kwargs):
