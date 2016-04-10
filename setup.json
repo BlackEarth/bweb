@@ -20,5 +20,6 @@
   },
   "package_data": {
     },
-  "data_files": []
+  "data_files": [],
+  "scripts": []
 }
