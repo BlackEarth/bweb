@@ -12,6 +12,5 @@ class Application(tornado.web.Application, Dict):
 
     def __call__(self, port=None):
         self.listen(port or (self.settings.Site or Dict()).port or 80)
-        self.log(self.settings.json(indent=2))
         tornado.ioloop.IOLoop.instance().start()
 
