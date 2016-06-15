@@ -6,9 +6,8 @@ from bl.dict import Dict
 from bl.log import Log
 
 class Application(tornado.web.Application, Dict):
-    def __init__(self, routes=None, default_host='', transforms=None, log=Log(), **settings):
+    def __init__(self, routes=None, default_host='', transforms=None, **settings):
         tornado.web.Application.__init__(self, routes, default_host=default_host, transforms=transforms)
-        self.log = log
         self.settings = Dict(**settings)
 
     def __call__(self, port=None):
