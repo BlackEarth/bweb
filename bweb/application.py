@@ -3,7 +3,6 @@
 
 import tornado.ioloop, tornado.web
 from bl.dict import Dict
-from bl.log import Log
 
 class Application(tornado.web.Application, Dict):
     def __init__(self, routes=None, default_host='', transforms=None, **settings):
