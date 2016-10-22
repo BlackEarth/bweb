@@ -1,0 +1,8 @@
+bcrypt==3.1.1
+bl==0.17.0
+bweb==0.2.1
+cffi==1.8.3
+passlib==1.6.5
+pycparser==2.16
+six==1.10.0
+tornado==4.4.2
