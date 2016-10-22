@@ -15,14 +15,9 @@ class Handler(tornado.web.RequestHandler, Dict):
     def arguments(self):
         return StringDict(**self.request.arguments)
 
-    def render(self, *args, **kwargs):
-        if 'c' not in kwargs:
-            kwargs['c'] = self
-        super().render(self, *args, **kwargs)
-
     def write_error(self, status_code, **kwargs):
         self.set_status(status_code)
-        self.render("http_error.html")
+        self.render("http_error.xhtml", status=status_code)
 
     # == Session management == 
 
