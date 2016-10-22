@@ -1,53 +1,72 @@
 
+import logging, os, re, time
+from glob import glob
+from datetime import datetime
 import functools
-from importlib import import_module
 import tornado.web
 from bl.dict import Dict, StringDict
 from bl.url import URL
+from bweb.session import Session
 
-class Handler(tornado.web.RequestHandler, Dict):
+log = logging.getLogger(__name__)
+log.setLevel(logging.DEBUG)
 
-    def __init__(self, application, request, **kwargs):
-        tornado.web.RequestHandler.__init__(self, application, request, **kwargs)
-        self.url = URL(self.request.full_url(), host=self.settings.host, scheme=self.settings.scheme)
-        self.HTTPError = tornado.web.HTTPError
+class Handler(tornado.web.RequestHandler):
 
-    def arguments(self):
-        return StringDict(**self.request.arguments)
+    def initialize(c):
+        c.os, c.re, c.time, c.glob, c.datetime = os, re, time, glob, datetime
+        c.config = c.settings.get('config')
+        c.url = URL(c.request.full_url(), host=c.settings.host, scheme=c.settings.scheme)
+        c.HTTPError = tornado.web.HTTPError
 
-    def write_error(self, status_code, **kwargs):
-        self.set_status(status_code)
-        self.render("http_error.xhtml", status=status_code)
+        c.messages = Dict()        
+
+    def arguments(c):
+        return StringDict(**c.request.arguments)
+
+    def render(c, template, **kwargs):
+        if c not in kwargs:
+            kwargs['c'] = c
+        super().render(template, **kwargs)
+
+    # def write_error(c, status_code, **kwargs):
+    #     c.set_status(status_code)
+    #     c.render("http_error.xhtml", status=status_code)
 
     # == Session management == 
 
-    def init_session(self, new=False, reload=False, expires_days=None, **args):
+    def init_session(c, new=False, reload=False, expires_days=None, **args):
         """initialize session"""
-        if new==True or reload==True or 'session' not in self.__dict__.keys() or self.session is None:
-            self.session_storage_class = eval(
-                'bweb.session.'+self.config.Site.session_storage   # use the config session_storage class
-                or 'SessionStorage'                                     # default to in-memory session storage
-            )
-            if self.session_storage_class==bweb.session.FileStorage:
-                session_storage = bweb.session.FileStorage(directory=self.config.Site.session_path)
+        if new==True or reload==True or 'session' not in c.__dict__.keys() or c.session is None:
+            storage_class_name = c.config.Site.session_storage or 'MemoryStorage'
+            if storage_class_name=='FileStorage':
+                from bweb.session.file_storage import FileStorage
+                c.session_storage = FileStorage(directory=c.config.Site.session_path)
+            elif storage_class_name=='DatabaseStorage':
+                from bweb.session.database_storage import DatabaseStorage
+                c.session_storage = DatabaseStorage(db=c.db)
+            elif storage_class_name=='MemcacheStorage':
+                from bweb.session.memcache_storage import MemcacheStorage
+                c.session_storage = MemcacheStorage(memcache_server=c.config.Site.memcache_server)
             else:
-                session_storage = bweb.session.SessionStorage()
+                from bweb.session import MemoryStorage
+                c.session_storage = MemoryStorage()
             if new==True: 
-                session_id = None
+                session_id = ''
             else: 
-                session_id = self.get_secure_cookie('session_id')   # None if no session was in process
-            self.session = session_storage.init_session(session_id)
-            self.set_secure_cookie('session_id', self.session.id, expires_days=expires_days)
-        self.session.update(**args)
+                session_id = (c.get_secure_cookie('session_id') or b'').decode('utf-8')
+            c.session = Session.load(c.session_storage, session_id)
+            c.set_secure_cookie('session_id', c.session.id.encode('utf-8'), expires_days=expires_days)
+        c.session.update(**args)
         
-    def clear_session(self):
+    def reset_session(c):
         """remove the session_id cookie and init a new session."""
-        self.clear_cookie('session_id')
-        self.init_session(new=True)
+        c.clear_cookie('session_id')
+        c.init_session(new=True)
 
-    def save_session(self):
-        if 'session' in self.__dict__.keys() and self.session is not None:
-            self.session.save()
+    def save_session(c):
+        if 'session' in c.__dict__.keys() and c.session is not None:
+            c.session.save()
 
     # decorator
     def require_admin(method):
@@ -57,18 +76,17 @@ class Handler(tornado.web.RequestHandler, Dict):
         If the user is logged in and doesn't have the given role, an HTTP_UNAUTHORIZED error is raised
         """
         @functools.wraps(method)
-        def wrapper(self, *args, **kwargs):
-            if self.session.user is None:
-                if self.request.method in ("GET", "HEAD"):
-                    url = URL(self.config.Site.url+self.request.path, host=self.request.host, scheme=self.request.protocol)
-                    if self.debug==True: print(url)
+        def wrapper(c, *args, **kwargs):
+            if c.session.user is None:
+                if c.request.method in ("GET", "HEAD"):
+                    url = URL(c.config.Site.url+c.request.path, host=c.request.host, scheme=c.request.protocol)
                     # *TODO*: store the 'next' url in the session
-                    self.redirect(self.get_login_url()+"?ret="+str(url))
+                    c.redirect(c.get_login_url()+"?ret="+str(url))
                     return
                 else:
                     raise tornado.web.HTTPError(403)
-            elif self.session.user.role != 'admin':
+            elif c.session.user.role != 'admin':
                 # *TODO*: check to see if the user has the given role
-                raise self.HTTPError(401)
-            return method(self, *args, **kwargs)
+                raise c.HTTPError(401)
+            return method(c, *args, **kwargs)
         return wrapper
