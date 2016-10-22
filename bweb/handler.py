@@ -30,13 +30,13 @@ class Handler(tornado.web.RequestHandler, Dict):
         """initialize session"""
         if new==True or reload==True or 'session' not in self.__dict__.keys() or self.session is None:
             self.session_storage_class = eval(
-                'amp.session.'+self.config.Site.session_storage   # use the config session_storage class
+                'bweb.session.'+self.config.Site.session_storage   # use the config session_storage class
                 or 'SessionStorage'                                     # default to in-memory session storage
             )
-            if self.session_storage_class==amp.session.FileStorage:
-                session_storage = amp.session.FileStorage(directory=self.config.Site.session_path)
+            if self.session_storage_class==bweb.session.FileStorage:
+                session_storage = bweb.session.FileStorage(directory=self.config.Site.session_path)
             else:
-                session_storage = amp.session.SessionStorage()
+                session_storage = bweb.session.SessionStorage()
             if new==True: 
                 session_id = None
             else: 
