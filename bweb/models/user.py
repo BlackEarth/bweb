@@ -180,13 +180,14 @@ class User(Model):
         # This pattern requires a combination of uppercase, lowercase, and letters.
         # Length must be at least C.MIN_PASSWORD_LEN.
         # Punctuation and non-ASCII letters are optional.
-        password_pattern = re.compile(
-            "((?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{%d,})" % C.MIN_PASSWORD_LEN, flags=re.U)
+        # password_pattern = re.compile(
+        #     "((?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{%d,})" % C.MIN_PASSWORD_LEN, flags=re.U)
         if type(password) not in [str, bytes]:
             errors.append("Password must be a string.")
         else:
             pwd = password.strip()
             if len(pwd) < C.MIN_PASSWORD_LEN:
+                print(pwd, len(pwd))
                 errors.append("Password must be at least %d characters long." % C.MIN_PASSWORD_LEN)
         return errors
 
