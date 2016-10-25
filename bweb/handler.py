@@ -5,6 +5,7 @@ from datetime import datetime
 import functools
 import tornado.web
 from bl.dict import Dict, StringDict
+from bl.string import String
 from bl.url import URL
 from bweb.session import Session
 
@@ -15,10 +16,10 @@ class Handler(tornado.web.RequestHandler):
 
     def initialize(c):
         c.os, c.re, c.time, c.glob, c.datetime = os, re, time, glob, datetime
+        c.String = String
         c.config = c.settings.get('config')
         c.url = URL(c.request.full_url(), host=c.settings.host, scheme=c.settings.scheme)
         c.HTTPError = tornado.web.HTTPError
-
         c.messages = Dict()        
 
     def arguments(c):
@@ -68,25 +69,37 @@ class Handler(tornado.web.RequestHandler):
         if 'session' in c.__dict__.keys() and c.session is not None:
             c.session.save()
 
-    # decorator
-    def require_admin(method):
-        """Decorate methods with this to require that the user be logged in with the given role.
-        If the user is not logged in, they will be redirected to the configured
-        `login url <RequestHandler.get_login_url>`.
-        If the user is logged in and doesn't have the given role, an HTTP_UNAUTHORIZED error is raised
-        """
-        @functools.wraps(method)
-        def wrapper(c, *args, **kwargs):
-            if c.session.user is None:
-                if c.request.method in ("GET", "HEAD"):
-                    url = URL(c.config.Site.url+c.request.path, host=c.request.host, scheme=c.request.protocol)
-                    # *TODO*: store the 'next' url in the session
-                    c.redirect(c.get_login_url()+"?ret="+str(url))
-                    return
-                else:
-                    raise tornado.web.HTTPError(403)
-            elif c.session.user.role != 'admin':
-                # *TODO*: check to see if the user has the given role
-                raise c.HTTPError(401)
-            return method(c, *args, **kwargs)
-        return wrapper
+# == decorators == 
+def require_login(method):
+    """Require the user of this method to be logged in."""
+    @functools.wraps(method)
+    def wrapper(c, *args, **kwargs):
+        if c.session.get('email') is None:
+            if c.request.method in ("GET", "HEAD"):
+                c.redirect(c.get_login_url()+"?return="+str(c.url))
+            else:
+                raise tornado.web.HTTPError(403)
+        return method(c, *args, **kwargs)
+    return wrapper
+
+def require_admin(method):
+    """Decorate methods with this to require that the user be logged in with the given role.
+    If the user is not logged in, they will be redirected to the configured
+    `login url <RequestHandler.get_login_url>`.
+    If the user is logged in and doesn't have the given role, an HTTP_UNAUTHORIZED error is raised
+    """
+    @functools.wraps(method)
+    def wrapper(c, *args, **kwargs):
+        if c.session.get('email') is None:
+            if c.request.method in ("GET", "HEAD"):
+                url = URL(c.config.Site.url+c.request.path, host=c.request.host, scheme=c.request.protocol)
+                # *TODO*: store the 'next' url in the session
+                c.redirect(c.get_login_url()+"?ret="+str(url))
+                return
+            else:
+                raise tornado.web.HTTPError(403)
+        elif c.session.user.role != 'admin':
+            # *TODO*: check to see if the user has the given role
+            raise c.HTTPError(401)
+        return method(c, *args, **kwargs)
+    return wrapper
