@@ -1,5 +1,8 @@
 
-import logging, os, re, time
+import logging 
+log = logging.getLogger(__name__)
+
+import os, re, time, json
 from glob import glob
 from datetime import datetime
 import functools
@@ -9,9 +12,6 @@ from bl.string import String
 from bl.url import URL
 from bweb.session import Session
 
-log = logging.getLogger(__name__)
-log.setLevel(logging.DEBUG)
-
 class Handler(tornado.web.RequestHandler):
 
     def initialize(c):
@@ -20,7 +20,7 @@ class Handler(tornado.web.RequestHandler):
         c.config = c.settings.get('config')
         c.url = URL(c.request.full_url(), host=c.settings.host, scheme=c.settings.scheme)
         c.HTTPError = tornado.web.HTTPError
-        c.messages = Dict()        
+        c.messages = Dict()
 
     def arguments(c):
         return StringDict(**c.request.arguments)
@@ -28,6 +28,7 @@ class Handler(tornado.web.RequestHandler):
     def render(c, template, **kwargs):
         if c not in kwargs:
             kwargs['c'] = c
+        log.debug("render %r %r" % (template, kwargs))
         super().render(template, **kwargs)
 
     # def write_error(c, status_code, **kwargs):
@@ -68,6 +69,46 @@ class Handler(tornado.web.RequestHandler):
     def save_session(c):
         if 'session' in c.__dict__.keys() and c.session is not None:
             c.session.save()
+
+    @property
+    def request_data(c):
+        """return request data as a Dict"""
+        return Dict(
+            method=c.request.method,
+            path=c.request.path,
+            query=c.request.query,
+            query_arguments=c.request.query_arguments,
+            # body=c.request.body,
+            body_arguments=c.request.body_arguments,
+            headers=c.header_data,
+            remote_ip=c.request.remote_ip,
+            protocol=c.request.protocol,
+            host=c.request.host,
+            time=c.request.request_time(),
+            # files={n:None for n in c.request.files.keys()},
+        )
+
+    @property
+    def header_data(c):
+        """return header data as a Dict, each key followed by a list of values"""
+        data = Dict()
+        for key, value in c.request.headers.get_all():
+            if key not in data:
+                data[key] = []
+            data[key].append(value)
+        return data
+
+    def log_request(c, session=None):
+        """return request data as a json string. omit body, files, cookies"""
+        from bweb.models.request_log import RequestLog
+        request_data = json.dumps(c.request_data)
+        session_data = json.dumps(session)
+        log_entry = RequestLog(c.db,         
+            request=request_data,
+            session=session_data,
+        )
+        log.debug(json.dumps(log_entry))
+        log_entry.insert()
 
 # == decorators == 
 def require_login(method):
