@@ -41,7 +41,7 @@ class DatabaseStorage(MemoryStorage):
     def __init__(self, db=None, session_model=SessionModel):
         if db is None:
             db = Database()
-            db.execute("""create table sessions (id varchar primary key, data text)""")
+            db.execute("""create table %(relation)s (id varchar primary key, data text)""" % session_model)
         self.db = db
         self.SessionModel = session_model
 
