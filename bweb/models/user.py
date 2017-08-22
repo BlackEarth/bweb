@@ -133,7 +133,7 @@ class User(Model):
             raise ValueError("password is not valid: %s" % '. '.join(pwd_errors))
         else:
             self.pwd = self.encrypt_password(password)
-    
+
     @classmethod
     def random_password(C, length=None, charset=None):
         """generate a random password. 
@@ -161,7 +161,8 @@ class User(Model):
     # -- validations --
 
     @classmethod
-    def email_errors(C, email, errors=[]):
+    def email_errors(C, email):
+        errors = []
         email_pattern = re.compile(
             "^[A-Z0-9._%+-]+@(?:[A-Z0-9-]+\.)+[A-Z]{2,}$", flags=re.I + re.U)
         if type(email)!=str: 
@@ -176,12 +177,13 @@ class User(Model):
 
         
     @classmethod
-    def password_errors(C, password, errors=[]):
+    def password_errors(C, password):
         # This pattern requires a combination of uppercase, lowercase, and letters.
         # Length must be at least C.MIN_PASSWORD_LEN.
         # Punctuation and non-ASCII letters are optional.
         # password_pattern = re.compile(
         #     "((?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{%d,})" % C.MIN_PASSWORD_LEN, flags=re.U)
+        errors = []
         if type(password) not in [str, bytes]:
             errors.append("Password must be a string.")
         else:
