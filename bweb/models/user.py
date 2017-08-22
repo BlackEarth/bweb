@@ -25,8 +25,8 @@ class User(Model):
         else:
             autogen = False
 
-        errors = C.email_errors(self.email, errors)        
-        errors = C.password_errors(self.password, errors)
+        errors = C.email_errors(self.email)        
+        errors = C.password_errors(self.password)
         
         if errors != []:
             return errors
