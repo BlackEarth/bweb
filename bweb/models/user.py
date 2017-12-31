@@ -196,7 +196,7 @@ class User(Model):
 def example_usage_doctest():
     """usage:
     >>> # Connect to the test db
-    >>> import be; db=bl.config.db()
+    >>> db=bl.config.db()
     >>> # We need a users table in our test db --
     >>> # the minimal users table is email, pwd, varchar, registered, verified. 
     >>> db.execute("create table users (email varchar primary key, pwd varchar, salt varchar, registered timestamp default now(), verified timestamp)")
