@@ -1,10 +1,11 @@
 -e git+https://github.com/BlackEarth/bf.git@8595a73b71543f407d51a27ca6318fd383c6c401#egg=bf
 -e git+https://github.com/BlackEarth/bl.git@27708be76b495d476a3de5cb4971fc406b1fbc93#egg=bl
--e git+https://github.com/BlackEarth/bref.git@fc60e0dca569e26ccc88cb498dbb531f73dd1177#egg=bref
--e git+https://github.com/BlackEarth/bxml.git@65414564c12ae243c79c3c70b29d76f62b46edeb#egg=bxml
+-e git+https://github.com/BlackEarth/bsql.git@0d9d26d38f68df0993285947723a5bddc4f79171#egg=bsql
+bxml==2.1.0
 cssselect==1.0.3
 cssutils==1.0.2
-libsass==0.13.4
-lxml==4.1.1
+libsass==0.14.2
+lxml==4.2.1
+Markdown==2.6.11
 six==1.11.0
-Unum==4.1.3
+Unum==4.1.4
