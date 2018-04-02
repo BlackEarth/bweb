@@ -1,6 +1,6 @@
 -e git+https://github.com/BlackEarth/bf.git@8595a73b71543f407d51a27ca6318fd383c6c401#egg=bf
 -e git+https://github.com/BlackEarth/bl.git@27708be76b495d476a3de5cb4971fc406b1fbc93#egg=bl
--e git+https://github.com/BlackEarth/bref.git@7664120d2e1421245f85419e78896dc9fa86734b#egg=bref
+-e git+https://github.com/BlackEarth/bref.git@fc60e0dca569e26ccc88cb498dbb531f73dd1177#egg=bref
 -e git+https://github.com/BlackEarth/bxml.git@65414564c12ae243c79c3c70b29d76f62b46edeb#egg=bxml
 cssselect==1.0.3
 cssutils==1.0.2
