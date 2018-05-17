@@ -189,7 +189,6 @@ class User(Model):
         else:
             pwd = password.strip()
             if len(pwd) < C.MIN_PASSWORD_LEN:
-                print(pwd, len(pwd))
                 errors.append("Password must be at least %d characters long." % C.MIN_PASSWORD_LEN)
         return errors
 
