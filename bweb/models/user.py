@@ -42,8 +42,7 @@ class User(Model):
                     errors += ["That email address is already registered."]                    
                 else:
                     errors += [sys.exc_info()[1]]
-                return errors
-        # if no errors, returns None
+        return errors
 
     def authenticate(self, email, password, unverified=False, upgrade=True):
         """Authenticate the login against the database.
