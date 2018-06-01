@@ -104,7 +104,7 @@ class User(Model):
 
     def before_insert_or_update(self):
         if self.name is not None:
-            self.name = re.sub('[^\w\s\.\-_]+', r'', self.name, flags=re.U)
+            self.name = re.sub(r'[^\w\s\.\-_]+', r'', self.name, flags=re.U)
         if self.password is not None and self.password.strip() != '':
             self.set_password(self.pop('password'))
     
@@ -163,7 +163,7 @@ class User(Model):
     def email_errors(C, email):
         errors = []
         email_pattern = re.compile(
-            "^[A-Z0-9._%+-]+@(?:[A-Z0-9-]+\.)+[A-Z]{2,}$", flags=re.I + re.U)
+            r"^[A-Z0-9._%+-]+@(?:[A-Z0-9-]+\.)+[A-Z]{2,}$", flags=re.I + re.U)
         if type(email)!=str: 
             errors.append("Email must be a text string.")
         else:
