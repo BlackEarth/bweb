@@ -1,7 +1,7 @@
 
 config = {
   "name": "bweb",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "Black Earth’s web interface library",
   "url": "https://github.com/BlackEarth/bweb",
   "author": "Sean Harrison",
