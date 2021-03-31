@@ -5,7 +5,7 @@ bxml==2.1.0
 cssselect==1.0.3
 cssutils==1.0.2
 libsass==0.14.2
-lxml==4.2.1
+lxml==4.6.3
 Markdown==2.6.11
 six==1.11.0
 Unum==4.1.4
